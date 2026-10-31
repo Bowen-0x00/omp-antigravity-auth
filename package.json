@@ -1,0 +1,47 @@
+{
+  "name": "omp-antigravity-auth",
+  "version": "1.0.0",
+  "description": "One-click Google Antigravity & Gemini Refresh Token Importer for Oh My Pi (omp)",
+  "keywords": [
+    "omp",
+    "oh-my-pi",
+    "pi-package",
+    "antigravity",
+    "gemini",
+    "google-antigravity",
+    "refresh-token",
+    "oauth"
+  ],
+  "author": "Bowen-0x00",
+  "license": "MIT",
+  "homepage": "https://github.com/Bowen-0x00/omp-antigravity-auth#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bowen-0x00/omp-antigravity-auth.git"
+  },
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "omp-ag-auth": "bin/omp-ag-auth.js"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types test/parser.test.ts"
+  },
+  "omp": {
+    "extensions": [
+      "./extension/omp-antigravity-auth.ts"
+    ]
+  },
+  "pi": {
+    "extensions": [
+      "./extension/omp-antigravity-auth.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@oh-my-pi/pi-coding-agent": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}
