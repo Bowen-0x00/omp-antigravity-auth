@@ -270,14 +270,7 @@ export default function (pi: ExtensionAPI) {
     }
 
     if (!raw) {
-      const usage = `# 🚀 /ag-import 使用帮助
-**用法**：
-- \`/ag-import <json文件路径>\` — 导入 Antigravity Tool 导出的 JSON 文件
-- \`/ag-import <email> <refresh_token>\` — 直接导入账号和 RT
-- \`/ag-import <商家账号格式整行>\` — 支持 \`账号|密码|... refresh_token:1//0...\`
-- 若未带参数，将自动尝试扫描“下载”文件夹中的 \`antigravity_accounts_*.json\`！
-`;
-      ctx.ui?.notify?.("warning", "Missing arguments. Run /ag-import with file path or 'email refresh_token'");
+      ctx.ui?.notify?.("warning", "用法: /ag-import <json文件路径 | 邮箱 refresh_token>");
       return;
     }
 

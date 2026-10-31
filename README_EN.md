@@ -1,171 +1,127 @@
-# 🚀 omp-antigravity-auth
+# omp-antigravity-auth
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform: OMP](https://img.shields.io/badge/Platform-Oh%20My%20Pi%20(omp)-purple.svg)](https://omp.sh)
-[![Node: >=18.0.0](https://img.shields.io/badge/Node->=18.0.0-green.svg)](https://nodejs.org)
+[English](README_EN.md) · [简体中文](README.md)
 
-[**中文说明**](README.md) | **English Documentation**
+Google Antigravity / Gemini refresh token importer and extension for [Oh My Pi (omp)](https://omp.sh).
 
-**omp-antigravity-auth** is a dedicated account credential and Google `refresh_token` (RT) importer and in-session extension for **Oh My Pi (omp)**.
+Directly import Google OAuth refresh tokens into OMP's local credential store without interactive browser authentication.
 
-It solves common friction points when managing or acquiring Google accounts—such as **CAPTCHA challenges, device verification blocks, geographical availability restrictions, and IP risk controls**. By directly importing Google OAuth `refresh_token` credentials into OMP's local store, OMP can smoothly rotate and utilize models like Gemini 3.1 Pro and Gemini 2.5 Flash without browser-based login loops.
+## Installation
 
----
-
-## ✨ Features
-
-- 📥 **Flexible Format Parser**:
-  - **Antigravity Tool Export Format**: Native parsing of `antigravity_accounts_*.json` (both array and single object).
-  - **Space / Tab Delimited**: `account@gmail.com 1//0xxxx...`
-  - **Merchant Pipe Format**: `Account|Password|Recovery|2FA|Year|Country refresh_token:1//0xxxx...`
-  - **Merchant Dash Format**: `Account----Password----Recovery----1//0xxxx...`
-  - **Bulk Multi-line Paste**: Filters out comment lines, empty lines, deduplicates by email, and extracts valid pairs.
-- 🔍 **Smart File Detection**: Automatically looks for the newest `antigravity_accounts_*.json` in Downloads and the current directory when no arguments are passed.
-- ⚡ **Dual Operational Modes**:
-  - **OMP In-Session Extension**: Type `/ag-import`, `/ag-list`, `/ag-verify` directly inside an active OMP conversation.
-  - **Standalone Terminal CLI**: Use `omp-ag-auth` from any shell or automation workflow.
-- 🛡️ **Native OMP Integration**: Compiles standard `omp auth import` documents, updates OMP's SQLite credential database, and triggers automatic token exchange and rotation.
-
----
-
-## 📦 Installation
-
-### Method 1: One-Click Script (Recommended)
-
-Clone the repository and run the setup script to copy the extension into `~/.omp/agent/extensions/`:
-
-- **Windows**: Double-click `install.bat`
-- **Linux / macOS**:
-  ```bash
-  chmod +x install.sh
-  ./install.sh
-  ```
-
----
-
-### Method 2: Global CLI Installation
+### Via OMP Plugin (Recommended)
 
 ```bash
-cd D:/Project/omp-antigravity-auth
-npm install
-npm run build
-npm link
-```
-After linking, `omp-ag-auth` can be invoked globally in any terminal.
-
----
-
-### Method 3: Manual Extension Copy
-
-Copy `extension/omp-antigravity-auth.ts` to your OMP extensions folder:
-- **Windows**: `%USERPROFILE%\.omp\agent\extensions\`
-- **Linux/macOS**: `~/.omp/agent/extensions/`
-
----
-
-## 💡 Usage
-
-### 1. In OMP Sessions (Slash Commands)
-
-Inside any interactive `omp` session, use:
-
-| Command | Description | Example |
-| :--- | :--- | :--- |
-| `/ag-import [target]` | Import account from a file path or direct string | `/ag-import C:\Users\Bowen\Downloads\antigravity_accounts_2026-10-31.json` |
-| `/ag-import` | Scans for the latest Antigravity export file in Downloads | `/ag-import` |
-| `/ag-list` | Display all configured Google Antigravity accounts in OMP | `/ag-list` |
-| `/ag-verify [index]` | Force a token refresh to check account connectivity | `/ag-verify 1` |
-
-> `/import-ag` is registered as an alias for `/ag-import`.
-
----
-
-### 2. Standalone Terminal CLI
-
-#### Import from Antigravity Tool JSON File
-```bash
-omp-ag-auth import C:\Users\Bowen\Downloads\antigravity_accounts_2026-10-31.json
+omp plugin install github:Bowen-0x00/omp-antigravity-auth
 ```
 
-#### Import from Raw Email and Token String
+Local link (for development):
+
 ```bash
-omp-ag-auth import "sample@gmail.com 1//0mock_antigravity_token_example..."
+omp plugin link /path/to/omp-antigravity-auth
 ```
 
-#### Import Merchant Export Line
+Uninstall:
+
 ```bash
-omp-ag-auth import "sample@gmail.com|pass123|recovery@gmail.com|2FA|2024|US refresh_token:1//0mock_antigravity_token..."
+omp plugin uninstall omp-antigravity-auth
 ```
 
-#### Auto-Detect Latest Download
-If run without arguments, it will automatically search your `Downloads` directory for matching `antigravity_accounts_*.json` files:
+### Alternative: Script Installation
+
+Copy the standalone extension to `~/.omp/agent/extensions/` using the provided script:
+
+- **Windows**: Run `install.bat`
+- **Linux / macOS**: `bash install.sh`
+
+## Quick Start
+
+### 1. In OMP Session (Slash Command)
+
+```text
+/ag-import [file|text]
+```
+
+- `/ag-import ./antigravity_accounts.json` — Import from JSON export file
+- `/ag-import user@gmail.com 1//0xxxx...` — Import from email and refresh token
+- `/ag-import` — Automatically scans `Downloads` for the newest `antigravity_accounts_*.json`
+- `/ag-list` — List registered Antigravity accounts in OMP
+- `/ag-verify [index]` — Force token refresh and check connectivity
+
+### 2. Standalone CLI
+
 ```bash
+# Import JSON file
+omp-ag-auth import ./antigravity_accounts.json
+
+# Import raw string (space separated)
+omp-ag-auth import "user@gmail.com 1//0xxxx..."
+
+# Delimited text (pipe / tab / colon)
+omp-ag-auth import "user@gmail.com|...|refresh_token:1//0xxxx..."
+
+# Auto-detect latest export in Downloads
 omp-ag-auth import
-```
 
-#### Dry Run Validation
-Parse and validate accounts without committing changes to OMP:
-```bash
-omp-ag-auth import "account@gmail.com 1//0..." --dry-run
-```
+# Dry run (validate only, no changes written)
+omp-ag-auth import ./antigravity_accounts.json --dry-run
 
-#### List Stored Accounts
-```bash
+# List stored accounts
 omp-ag-auth list
-```
 
-#### Verify Connection
-```bash
+# Verify token
 omp-ag-auth verify
 ```
 
----
+## Supported Formats
 
-## 📋 Supported Formats
+### JSON Array (Antigravity Manager Export)
 
-### 1. Antigravity Tool Export (JSON Array)
 ```json
 [
   {
-    "email": "myaccount@gmail.com",
-    "refresh_token": "1//0mock_antigravity_refresh_token_example..."
+    "email": "user@gmail.com",
+    "refresh_token": "1//0xxxx..."
   }
 ]
 ```
 
-### 2. Single JSON Object
+### Single JSON Object
+
 ```json
 {
-  "email": "myaccount@gmail.com",
-  "refresh_token": "1//0mock_antigravity_refresh_token_example..."
+  "email": "user@gmail.com",
+  "refresh_token": "1//0xxxx..."
 }
 ```
 
-### 3. Multi-line Merchant Text
+### Raw Text / Delimited Lines
+
+Supports space, tab, pipe (`|`), or dash (`----`) separated lines, and multi-line batches:
+
 ```text
-account1@gmail.com 1//0xxxxxx1
-account2@gmail.com|password|recovery@gmail.com|2FA refresh_token:1//0xxxxxx2
-account3@gmail.com----pass----1//0xxxxxx3
+user1@gmail.com 1//0xxxx1
+user2@gmail.com|...|refresh_token:1//0xxxx2
+user3@gmail.com----...----1//0xxxx3
 ```
 
----
+## CLI Reference
 
-## ⚠️ Notes & Tips
+```text
+Usage: omp-ag-auth [command] [options] [arguments...]
 
-1. **Proxy Environment**:
-   When exchanging tokens, `omp` communicates with `https://oauth2.googleapis.com/token`. Ensure your terminal has proxy settings configured (`HTTP_PROXY` / `HTTPS_PROXY`) if Google services are restricted in your region.
+Commands:
+  import [target]       Import accounts from JSON file, text file, or raw string
+  list                  List stored google-antigravity accounts in OMP
+  verify [index]        Test & force-refresh token for an account
+  help, -h, --help      Show help message
+  version, -v           Show version
 
-2. **Age Verification**:
-   Newly created accounts might trigger an `ineligibleTiers` status until age verification is completed. Log in to the Google account and visit [https://myaccount.google.com/age-verification](https://myaccount.google.com/age-verification).
+Options:
+  --dry-run             Validate without saving to OMP
+  --project <id>        Set Google Cloud Project ID (default: "aicode-consumers")
+  --verify              Verify token immediately after importing
+```
 
-3. **Backup Credentials**:
-   You can export and back up all existing model credentials at any time:
-   ```bash
-   omp auth export > backup_credentials.json
-   ```
+## License
 
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
+[MIT](LICENSE)

@@ -47,14 +47,14 @@ function runTests() {
     console.log("  ✓ Test 3 Passed: Space-separated 'email refresh_token' parsing");
   }
 
-  // Test 4: Merchant pipe-delimited format with Chinese colon
+  // Test 4: Pipe-delimited format with Chinese colon
   {
-    const line = "seller_account@gmail.com|Password123|recovery@gmail.com|2FA_CODE|2024|US refresh_token：1//0merchant_token_sample_1234567890";
+    const line = "test_user@gmail.com|Password123|recovery@gmail.com|2FA_CODE|2024|US refresh_token：1//0token_sample_1234567890";
     const item = parseLine(line);
-    assert.ok(item, "Should parse merchant pipe format");
-    assert.strictEqual(item?.email, "seller_account@gmail.com");
-    assert.strictEqual(item?.refreshToken, "1//0merchant_token_sample_1234567890");
-    console.log("  ✓ Test 4 Passed: Merchant pipe format with Chinese colon parsing");
+    assert.ok(item, "Should parse pipe format");
+    assert.strictEqual(item?.email, "test_user@gmail.com");
+    assert.strictEqual(item?.refreshToken, "1//0token_sample_1234567890");
+    console.log("  ✓ Test 4 Passed: Pipe-delimited format with Chinese colon parsing");
   }
 
   // Test 5: Merchant dash-delimited format

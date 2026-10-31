@@ -17,9 +17,8 @@ USAGE:
   omp-ag-auth [command] [options] [arguments...]
 
 COMMANDS:
-  import [target]       Import accounts from Antigravity JSON export file, text file,
-                        or direct string ("email refresh_token" / merchant line)
-  list                  List all google-antigravity accounts in omp
+  import [target]       Import accounts from JSON file, text file,
+                        or direct string ("email refresh_token" or delimited line)
   verify [index]        Test & force-refresh token for an account (default: primary)
   help, -h, --help      Show this help message
   version, -v           Show version information
@@ -36,7 +35,7 @@ EXAMPLES:
   # 2. Import from raw email and refresh token:
   omp-ag-auth import "myaccount@gmail.com 1//0mock_antigravity_token_example"
 
-  # 3. Import from merchant line format:
+  # 3. Import from delimited line format:
   omp-ag-auth import "acc@gmail.com|pass|recovery|2FA refresh_token:1//0mock_antigravity_token_example"
 
   # 4. Auto-detect from Downloads folder (no arguments):
