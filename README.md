@@ -4,7 +4,7 @@
 
 Google Antigravity / Gemini refresh token 凭据导入工具与 [Oh My Pi (omp)](https://omp.sh) 会话扩展。
 
-支持直接将 Google OAuth refresh token 导入 OMP 本地凭据库，无需交互式浏览器登录。
+支持直接将 Google OAuth refresh token 导入 OMP 本地凭据库，无需交互式浏览器登录。若仅提供 refresh token，会自动从 Google 校验并解析对应的 Gmail 邮箱。
 
 ## 安装
 
@@ -14,7 +14,7 @@ Google Antigravity / Gemini refresh token 凭据导入工具与 [Oh My Pi (omp)]
 omp plugin install github:Bowen-0x00/omp-antigravity-auth
 ```
 
-本地链接开发：
+本地开发链接：
 
 ```bash
 omp plugin link /path/to/omp-antigravity-auth
@@ -41,6 +41,7 @@ omp plugin uninstall omp-antigravity-auth
 /ag-import [文件路径 | 文本内容]
 ```
 
+- `/ag-import 1//0xxxx...` — 直接输入 refresh token（自动解析对应 Gmail 邮箱）
 - `/ag-import ./antigravity_accounts.json` — 导入 Antigravity 导出的 JSON 文件
 - `/ag-import user@gmail.com 1//0xxxx...` — 导入单个账号与 refresh token
 - `/ag-import` — 未指定参数时，自动扫描“下载”目录最新的 `antigravity_accounts_*.json` 并导入
@@ -50,6 +51,9 @@ omp plugin uninstall omp-antigravity-auth
 ### 2. 独立终端中使用（CLI）
 
 ```bash
+# 仅凭 refresh token 导入（自动解析邮箱）
+omp-ag-auth import "1//0xxxx..."
+
 # 导入 JSON 导出文件
 omp-ag-auth import ./antigravity_accounts.json
 
@@ -73,6 +77,14 @@ omp-ag-auth verify
 ```
 
 ## 支持的输入格式
+
+### 仅 Refresh Token
+
+直接输入 `1//0...` 字符串，工具将自动从 Google 解析并补全真实邮箱：
+
+```text
+1//0xxxx...
+```
 
 ### JSON 数组（Antigravity Manager 导出格式）
 

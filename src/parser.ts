@@ -44,14 +44,13 @@ function parseObject(obj: Record<string, unknown>): AccountItem | null {
 
   const projectId = (typeof obj.projectId === "string" ? obj.projectId : typeof obj.project_id === "string" ? obj.project_id : undefined);
 
-  if (email && refreshToken) {
+  if (refreshToken) {
     return {
       email,
       refreshToken,
       projectId: projectId || "aicode-consumers"
     };
   }
-
   return null;
 }
 
@@ -74,13 +73,9 @@ export function parseLine(line: string): AccountItem | null {
     }
   }
 
-  // 2. Extract email
+  // 2. Extract email (optional)
   const emailMatch = trimmed.match(EMAIL_REGEX);
-  if (!emailMatch) {
-    return null;
-  }
-  const email = emailMatch[0].trim();
-
+  const email = emailMatch ? emailMatch[0].trim() : "";
   // 3. Extract refresh token
   let token = "";
   const tokenMatchPrefixed = trimmed.match(REFRESH_TOKEN_PREFIXED_REGEX);
@@ -93,7 +88,7 @@ export function parseLine(line: string): AccountItem | null {
     }
   }
 
-  if (email && token) {
+  if (token) {
     return {
       email,
       refreshToken: token,
@@ -101,7 +96,6 @@ export function parseLine(line: string): AccountItem | null {
       rawSource: trimmed
     };
   }
-
   return null;
 }
 
@@ -176,7 +170,8 @@ export function parseContent(content: string): ParseResult {
 function deduplicateAccounts(accounts: AccountItem[], invalidLines: string[]): ParseResult {
   const map = new Map<string, AccountItem>();
   for (const acc of accounts) {
-    map.set(acc.email.toLowerCase(), acc);
+    const key = acc.email ? acc.email.toLowerCase() : `token:${acc.refreshToken}`;
+    map.set(key, acc);
   }
   return {
     accounts: Array.from(map.values()),

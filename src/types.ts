@@ -2,6 +2,8 @@ export interface AccountItem {
   email: string;
   refreshToken: string;
   projectId?: string;
+  accessToken?: string;
+  expiresAt?: number;
   rawSource?: string;
 }
 

@@ -204,7 +204,8 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
     for (let i = 0; i < parsed.accounts.length; i++) {
       const acc = parsed.accounts[i];
       const maskedToken = acc.refreshToken.slice(0, 8) + "..." + acc.refreshToken.slice(-6);
-      console.log(`  [${i + 1}] ${acc.email} (token: ${maskedToken})`);
+      const emailLabel = acc.email || "(resolving email from Google...)";
+      console.log(`  [${i + 1}] ${emailLabel} (token: ${maskedToken})`);
     }
 
     const options: ImportOptions = {
@@ -222,6 +223,12 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
     }
 
     console.log(`\n✅ ${result.output || `Successfully imported ${result.imported} account(s)!`}`);
+    if (result.accounts.some(a => a.email)) {
+      console.log("Account details:");
+      for (const a of result.accounts) {
+        console.log(`  - ${a.email}`);
+      }
+    }
 
     // Verify if requested
     if (options.verify) {

@@ -4,7 +4,7 @@
 
 Google Antigravity / Gemini refresh token importer and extension for [Oh My Pi (omp)](https://omp.sh).
 
-Directly import Google OAuth refresh tokens into OMP's local credential store without interactive browser authentication.
+Directly import Google OAuth refresh tokens into OMP's local credential store without interactive browser authentication. If only a refresh token is supplied, the associated Gmail address is automatically resolved from Google.
 
 ## Installation
 
@@ -41,6 +41,7 @@ Copy the standalone extension to `~/.omp/agent/extensions/` using the provided s
 /ag-import [file|text]
 ```
 
+- `/ag-import 1//0xxxx...` — Import using only a refresh token (auto-resolves Gmail address)
 - `/ag-import ./antigravity_accounts.json` — Import from JSON export file
 - `/ag-import user@gmail.com 1//0xxxx...` — Import from email and refresh token
 - `/ag-import` — Automatically scans `Downloads` for the newest `antigravity_accounts_*.json`
@@ -50,6 +51,9 @@ Copy the standalone extension to `~/.omp/agent/extensions/` using the provided s
 ### 2. Standalone CLI
 
 ```bash
+# Import using only refresh token (auto-resolves email)
+omp-ag-auth import "1//0xxxx..."
+
 # Import JSON file
 omp-ag-auth import ./antigravity_accounts.json
 
@@ -73,6 +77,14 @@ omp-ag-auth verify
 ```
 
 ## Supported Formats
+
+### Refresh Token Only
+
+Pass the `1//0...` string directly; the tool will query Google and resolve the account email automatically:
+
+```text
+1//0xxxx...
+```
 
 ### JSON Array (Antigravity Manager Export)
 

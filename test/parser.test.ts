@@ -112,6 +112,16 @@ dup@gmail.com 1//0second_token_22222222222222222222
     console.log("  ✓ Test 8 Passed: OMP auth document generation");
   }
 
+  // Test 9: Standalone refresh token (no email provided)
+  {
+    const line = "1//0mock_standalone_token_1234567890abcdefghijklmnopqrstuvwxyz";
+    const item = parseLine(line);
+    assert.ok(item, "Should parse standalone token without email");
+    assert.strictEqual(item?.email, "");
+    assert.strictEqual(item?.refreshToken, "1//0mock_standalone_token_1234567890abcdefghijklmnopqrstuvwxyz");
+    console.log("  ✓ Test 9 Passed: Standalone refresh token parsing");
+  }
+
   console.log("\n🎉 All tests passed successfully!\n");
 }
 
