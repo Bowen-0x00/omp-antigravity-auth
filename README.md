@@ -47,6 +47,7 @@ omp plugin uninstall omp-antigravity-auth
 - `/ag-import` — 未指定参数时，自动扫描“下载”目录最新的 `antigravity_accounts_*.json` 并导入
 - `/ag-list` — 列出当前 OMP 中已注册的所有 Antigravity 账号
 - `/ag-verify [序号]` — 强制刷新 Token 并检验可用性
+- `/ag-remove [序号 | 邮箱]` — 从 OMP 凭据库中删除指定账号
 
 ### 2. 独立终端中使用（CLI）
 
@@ -74,6 +75,10 @@ omp-ag-auth list
 
 # 验证 Token 连通性
 omp-ag-auth verify
+
+# 删除指定账号（支持序号或邮箱）
+omp-ag-auth remove 1
+omp-ag-auth remove user@gmail.com
 ```
 
 ## 支持的输入格式
@@ -124,6 +129,7 @@ Usage: omp-ag-auth [command] [options] [arguments...]
 Commands:
   import [target]       从文件、多行文本或单行字符串导入账号
   list                  查看 OMP 中已存储的 google-antigravity 账号
+  remove <index|email>  删除指定账号（支持 1-based 序号或邮箱）
   verify [index]        测试并强制刷新账号 Token
   help, -h, --help      查看帮助
   version, -v           查看版本

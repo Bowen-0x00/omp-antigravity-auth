@@ -47,6 +47,7 @@ Copy the standalone extension to `~/.omp/agent/extensions/` using the provided s
 - `/ag-import` — Automatically scans `Downloads` for the newest `antigravity_accounts_*.json`
 - `/ag-list` — List registered Antigravity accounts in OMP
 - `/ag-verify [index]` — Force token refresh and check connectivity
+- `/ag-remove [index | email]` — Remove a specific account from OMP
 
 ### 2. Standalone CLI
 
@@ -74,6 +75,10 @@ omp-ag-auth list
 
 # Verify token
 omp-ag-auth verify
+
+# Remove specific account by index or email
+omp-ag-auth remove 1
+omp-ag-auth remove user@gmail.com
 ```
 
 ## Supported Formats
@@ -124,6 +129,7 @@ Usage: omp-ag-auth [command] [options] [arguments...]
 Commands:
   import [target]       Import accounts from JSON file, text file, or raw string
   list                  List stored google-antigravity accounts in OMP
+  remove <index|email>  Remove a specific account by 1-based index or email
   verify [index]        Test & force-refresh token for an account
   help, -h, --help      Show help message
   version, -v           Show version
