@@ -408,6 +408,41 @@ async function executeImport(accounts: AccountItem[]): Promise<{ success: boolea
   }
 }
 
+function removeAccount(target: string | number): { success: boolean; message: string } {
+  const dbPath = path.join(os.homedir(), ".omp", "agent", "agent.db");
+  if (!fs.existsSync(dbPath)) {
+    return { success: false, message: "OMP database not found at ~/.omp/agent/agent.db" };
+  }
+
+  const raw = String(target).trim();
+  let email = raw;
+
+  if (/^\d+$/.test(raw)) {
+    const idx = parseInt(raw, 10);
+    const ompPath = resolveOmpPath();
+    const out = cp.execSync(`"${ompPath}" token google-antigravity --list`, {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"]
+    }).trim();
+    const accounts = out ? out.split(/\r?\n/).map(l => l.trim()).filter(Boolean) : [];
+    if (idx < 1 || idx > accounts.length) {
+      return { success: false, message: `Invalid index ${idx}. Valid range: 1-${accounts.length}` };
+    }
+    const match = accounts[idx - 1].match(/[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}/);
+    if (match) email = match[0];
+  }
+
+  const cleanEmail = email.toLowerCase().replace(/^email:/, "");
+  try {
+    cp.execSync(`sqlite3 "${dbPath}" "DELETE FROM auth_credentials WHERE provider = 'google-antigravity' AND identity_key = 'email:${cleanEmail}';"`, {
+      stdio: "ignore"
+    });
+    return { success: true, message: `Successfully removed ${cleanEmail} from OMP.` };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : String(err) };
+  }
+}
+
 export default function (pi: ExtensionAPI) {
   // 1. Register /ag-import
   const handleImport = async (argsString: string | undefined, ctx: ExtensionCommandContext) => {
@@ -506,6 +541,24 @@ export default function (pi: ExtensionAPI) {
           stderr = String(err);
         }
         ctx.ui?.notify?.("error", `Verification failed: ${stderr.trim()}`);
+      }
+    }
+  });
+
+  // 4. Register /ag-remove
+  pi.registerCommand("ag-remove", {
+    description: "Remove a Google Antigravity account by index or email: /ag-remove <index|email>",
+    handler: async (argsString, ctx) => {
+      const target = (argsString || "").trim();
+      if (!target) {
+        ctx.ui?.notify?.("warning", "用法: /ag-remove <序号或邮箱>");
+        return;
+      }
+      const res = removeAccount(target);
+      if (res.success) {
+        ctx.ui?.notify?.("success", res.message);
+      } else {
+        ctx.ui?.notify?.("error", res.message);
       }
     }
   });

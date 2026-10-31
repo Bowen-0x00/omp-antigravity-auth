@@ -4,7 +4,7 @@ import * as path from "node:path";
 import * as readlinePromises from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { parseContent, parseInput } from "./parser.js";
-import { importAccounts, listOmpAccounts, verifyAccount } from "./importer.js";
+import { importAccounts, listOmpAccounts, verifyAccount, removeAccount } from "./importer.js";
 import type { ImportOptions } from "./types.js";
 
 const VERSION = "1.0.0";
@@ -19,10 +19,10 @@ USAGE:
 COMMANDS:
   import [target]       Import accounts from JSON file, text file,
                         or direct string ("email refresh_token" or delimited line)
+  remove <index|email>  Remove a specific account by 1-based index or email address
   verify [index]        Test & force-refresh token for an account (default: primary)
   help, -h, --help      Show this help message
   version, -v           Show version information
-
 OPTIONS:
   --dry-run             Validate and parse without applying changes to omp
   --project <id>        Set custom Google Cloud Project ID (default: "aicode-consumers")
@@ -151,6 +151,21 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
       return 0;
     } else {
       console.error(`❌ Verification failed:\n${result.message}`);
+      return 1;
+    }
+  }
+
+  if (command === "remove" || command === "rm" || command === "delete") {
+    if (!targetArg) {
+      console.error("❌ Please specify account index or email to remove: omp-ag-auth remove <index|email>");
+      return 1;
+    }
+    const res = removeAccount(targetArg);
+    if (res.success) {
+      console.log(`✅ ${res.message}`);
+      return 0;
+    } else {
+      console.error(`❌ ${res.message}`);
       return 1;
     }
   }

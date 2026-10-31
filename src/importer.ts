@@ -370,3 +370,37 @@ export function verifyAccount(accountIndex?: number): { ok: boolean; message: st
     return { ok: false, message: stderr.trim() };
   }
 }
+
+/**
+ * Remove a specific google-antigravity account by index (1-based) or email
+ */
+export function removeAccount(target: string | number): { success: boolean; message: string } {
+  const dbPath = path.join(os.homedir(), ".omp", "agent", "agent.db");
+  if (!fs.existsSync(dbPath)) {
+    return { success: false, message: "OMP database not found at ~/.omp/agent/agent.db" };
+  }
+
+  const raw = String(target).trim();
+  let email = raw;
+
+  if (/^\d+$/.test(raw)) {
+    const idx = parseInt(raw, 10);
+    const accounts = listOmpAccounts();
+    if (idx < 1 || idx > accounts.length) {
+      return { success: false, message: `Invalid account index ${idx}. Valid range: 1-${accounts.length}` };
+    }
+    const match = accounts[idx - 1].match(/[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}/);
+    if (match) email = match[0];
+  }
+
+  const cleanEmail = email.toLowerCase().replace(/^email:/, "");
+
+  try {
+    cp.execSync(`sqlite3 "${dbPath}" "DELETE FROM auth_credentials WHERE provider = 'google-antigravity' AND identity_key = 'email:${cleanEmail}';"`, {
+      stdio: "ignore"
+    });
+    return { success: true, message: `Successfully removed ${cleanEmail} from OMP.` };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : String(err) };
+  }
+}
